@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.6.0](https://github.com/ericboehs/pi-footer/compare/v0.5.1...v0.6.0) (2026-08-20)
+
+
+### Features
+
+* add per-second option to speed widgets ([388ab82](https://github.com/ericboehs/pi-footer/commit/388ab82a606e96852fa927b1c3efa458bc64e2b1))
+* hide session cost for selected providers ([1a2f6ff](https://github.com/ericboehs/pi-footer/commit/1a2f6ff0664c41bf17c107e91968106f68bb4b5b))
+
+
+### Performance
+
+* ship prebuilt bundled dist to speed up pi startup ([4c34d7b](https://github.com/ericboehs/pi-footer/commit/4c34d7b64e54dd97897675fa4ab78483a6967ebd))
+
+
+### Dependencies
+
+* **deps-dev:** bump @types/node from 26.1.0 to 26.2.0 ([#72](https://github.com/ericboehs/pi-footer/issues/72)) ([bcd39ba](https://github.com/ericboehs/pi-footer/commit/bcd39ba0d1d20d83d5188e795edd5beb1db5b638))
+* **deps-dev:** bump oxfmt from 0.61.0 to 0.63.0 ([#74](https://github.com/ericboehs/pi-footer/issues/74)) ([73988a5](https://github.com/ericboehs/pi-footer/commit/73988a5079f5614dbf76acdd1b82bf302a69136c))
+* **deps-dev:** bump oxlint from 1.76.0 to 1.77.0 ([#68](https://github.com/ericboehs/pi-footer/issues/68)) ([2b606c6](https://github.com/ericboehs/pi-footer/commit/2b606c6f676bc7fc8324311e1db824bbd4b9cf43))
+* **deps-dev:** bump oxlint from 1.77.0 to 1.78.0 ([#73](https://github.com/ericboehs/pi-footer/issues/73)) ([e06439a](https://github.com/ericboehs/pi-footer/commit/e06439a832948e392a48131bf37691e41720f412))
+* **deps:** bump undici and @earendil-works/pi-coding-agent ([#70](https://github.com/ericboehs/pi-footer/issues/70)) ([12ec8ea](https://github.com/ericboehs/pi-footer/commit/12ec8eaa685328ec4a72855a07b836a386aee85f))
+
 ## [0.5.1](https://github.com/wobondar/pi-footer/compare/v0.5.0...v0.5.1) (2026-08-02)
 
 
