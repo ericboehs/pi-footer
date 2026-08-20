@@ -1317,12 +1317,53 @@ var TOKEN_FORMAT_CHOICES = TOKEN_FORMAT_STYLE_VALUES.map((style) => ({
 function formatTokenCount(value, style) {
   return TOKEN_FORMAT_STYLES[style].format(value);
 }
-function formatTokenSpeed(tokens, first, last, tokenFormatStyle) {
-  if (first === void 0 || last === void 0 || !Number.isFinite(first) || !Number.isFinite(last) || last <= first) {
-    return "0/min";
+var SPEED_UNITS = {
+  "per-minute": {
+    label: "Per minute",
+    list: "Per minute",
+    suffix: "/min",
+    perMs: 6e4
+  },
+  "per-second": {
+    label: "Per second",
+    list: "Per second",
+    suffix: "/s",
+    perMs: 1e3
   }
-  const minutes = Math.max((last - first) / 6e4, 1 / 60);
-  return `${formatTokenCount(Math.round(tokens / minutes), tokenFormatStyle)}/min`;
+};
+var SPEED_UNIT_VALUES = Object.keys(SPEED_UNITS);
+var SPEED_UNIT_CHOICES = SPEED_UNIT_VALUES.map((unit) => ({
+  id: unit,
+  label: SPEED_UNITS[unit].label,
+  list: SPEED_UNITS[unit].list
+}));
+var MIN_SPAN_MS = 1e3;
+function speedUnitSuffix(speedUnit) {
+  return SPEED_UNITS[speedUnit].suffix;
+}
+function formatTokenSpeed(tokens, first, last, tokenFormatStyle, speedUnit = "per-minute") {
+  const unit = SPEED_UNITS[speedUnit];
+  if (first === void 0 || last === void 0 || !Number.isFinite(first) || !Number.isFinite(last) || last <= first) {
+    return `0${unit.suffix}`;
+  }
+  const spanMs = Math.max(last - first, MIN_SPAN_MS);
+  const rate = Math.round(tokens * unit.perMs / spanMs);
+  return `${formatTokenCount(rate, tokenFormatStyle)}${unit.suffix}`;
+}
+function speedUnitProperty() {
+  return {
+    id: "speedUnit",
+    label: "Speed unit",
+    kind: "choice",
+    description: "Rate window used for token speed",
+    default: "per-minute",
+    options: {
+      choices: SPEED_UNIT_CHOICES,
+      showInWidgets: true,
+      showInColors: false,
+      listProperty: "rate"
+    }
+  };
 }
 function tokenFormatStyleProperty() {
   return {
@@ -3231,22 +3272,25 @@ var InputSpeedWidget = defineWidget({
   type: "input-speed",
   label: "Input Speed",
   category: "Tokens",
-  description: "Average input tokens per minute",
+  description: "Average input token speed",
   dependencies: ["metrics"],
   baseOptions: ["raw", "hideWhenZero", "icon"],
   baseOptionDefaults: {},
-  properties: [tokenFormatStyleProperty()],
+  properties: [tokenFormatStyleProperty(), speedUnitProperty()],
   icons: { emoji: "\u23EB", nerd: "\uEAF4", text: "in/min" },
   defaultStyle: { fg: "brightMagenta", bg: "default", bold: false },
   render({ ctx, options, renderWidget }) {
-    return renderWidget(
-      formatTokenSpeed(
-        ctx.metrics.inputTokens,
-        ctx.metrics.firstTimestampMs,
-        ctx.metrics.lastTimestampMs,
-        options.tokenFormatStyle
-      )
+    const value = formatTokenSpeed(
+      ctx.metrics.inputTokens,
+      ctx.metrics.firstTimestampMs,
+      ctx.metrics.lastTimestampMs,
+      options.tokenFormatStyle,
+      options.speedUnit
     );
+    if (ctx.iconMode !== "text") return renderWidget(value);
+    return renderWidget(value, {
+      icons: { emoji: "", nerd: "", text: `in${speedUnitSuffix(options.speedUnit)}` }
+    });
   }
 });
 
@@ -3272,22 +3316,25 @@ var OutputSpeedWidget = defineWidget({
   type: "output-speed",
   label: "Output Speed",
   category: "Tokens",
-  description: "Average output tokens per minute",
+  description: "Average output token speed",
   dependencies: ["metrics"],
   baseOptions: ["raw", "hideWhenZero", "icon"],
   baseOptionDefaults: {},
-  properties: [tokenFormatStyleProperty()],
+  properties: [tokenFormatStyleProperty(), speedUnitProperty()],
   icons: { emoji: "\u23EC", nerd: "\uEAF3", text: "out/min" },
   defaultStyle: { fg: "brightCyan", bg: "default", bold: false },
   render({ ctx, options, renderWidget }) {
-    return renderWidget(
-      formatTokenSpeed(
-        ctx.metrics.outputTokens,
-        ctx.metrics.firstTimestampMs,
-        ctx.metrics.lastTimestampMs,
-        options.tokenFormatStyle
-      )
+    const value = formatTokenSpeed(
+      ctx.metrics.outputTokens,
+      ctx.metrics.firstTimestampMs,
+      ctx.metrics.lastTimestampMs,
+      options.tokenFormatStyle,
+      options.speedUnit
     );
+    if (ctx.iconMode !== "text") return renderWidget(value);
+    return renderWidget(value, {
+      icons: { emoji: "", nerd: "", text: `out${speedUnitSuffix(options.speedUnit)}` }
+    });
   }
 });
 
@@ -3332,22 +3379,25 @@ var TotalSpeedWidget = defineWidget({
   type: "total-speed",
   label: "Total Speed",
   category: "Tokens",
-  description: "Average total tokens per minute",
+  description: "Average total token speed",
   dependencies: ["metrics"],
   baseOptions: ["raw", "hideWhenZero", "icon"],
   baseOptionDefaults: {},
-  properties: [tokenFormatStyleProperty()],
+  properties: [tokenFormatStyleProperty(), speedUnitProperty()],
   icons: { emoji: "\u26A1", nerd: "\u2195", text: "tok/min" },
   defaultStyle: { fg: "brightGreen", bg: "default", bold: false },
   render({ ctx, options, renderWidget }) {
-    return renderWidget(
-      formatTokenSpeed(
-        ctx.metrics.totalTokens,
-        ctx.metrics.firstTimestampMs,
-        ctx.metrics.lastTimestampMs,
-        options.tokenFormatStyle
-      )
+    const value = formatTokenSpeed(
+      ctx.metrics.totalTokens,
+      ctx.metrics.firstTimestampMs,
+      ctx.metrics.lastTimestampMs,
+      options.tokenFormatStyle,
+      options.speedUnit
     );
+    if (ctx.iconMode !== "text") return renderWidget(value);
+    return renderWidget(value, {
+      icons: { emoji: "", nerd: "", text: `tok${speedUnitSuffix(options.speedUnit)}` }
+    });
   }
 });
 
